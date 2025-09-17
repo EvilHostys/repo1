@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CraftLauncher - Minecraft Web Launcher</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/animations.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Background -->
+        <div class="background-container">
+            <div class="background-overlay"></div>
+            <video class="background-video" autoplay muted loop>
+                <source src="https://assets.minecraft.net/video/minecraft-trailer.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="loading-screen">
+            <div class="loading-content">
+                <div class="loading-logo">
+                    <i class="fas fa-cube"></i>
+                    <h1>CraftLauncher</h1>
+                </div>
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Initializing launcher...</p>
+            </div>
+        </div>
+
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen hidden">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="logo">
+                        <i class="fas fa-cube"></i>
+                        <h1>CraftLauncher</h1>
+                    </div>
+                    <p>Launch Minecraft from your browser</p>
+                </div>
+
+                <div class="login-form">
+                    <div class="auth-tabs">
+                        <button class="tab-btn active" data-tab="offline">Offline</button>
+                        <button class="tab-btn" data-tab="microsoft">Microsoft</button>
+                        <button class="tab-btn" data-tab="mojang">Mojang</button>
+                    </div>
+
+                    <div class="tab-content active" id="offline-tab">
+                        <div class="input-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" placeholder="Enter your username" required>
+                        </div>
+                        <button class="btn btn-primary" id="login-offline">
+                            <i class="fas fa-play"></i>
+                            Play Offline
+                        </button>
+                    </div>
+
+                    <div class="tab-content" id="microsoft-tab">
+                        <div class="oauth-login">
+                            <button class="btn btn-microsoft" id="login-microsoft">
+                                <i class="fab fa-microsoft"></i>
+                                Login with Microsoft
+                            </button>
+                            <p class="oauth-info">Secure authentication with your Microsoft account</p>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="mojang-tab">
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                        </div>
+                        <button class="btn btn-primary" id="login-mojang">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </button>
+                    </div>
+                </div>
+
+                <div class="login-footer">
+                    <div class="settings-toggle">
+                        <button class="btn btn-secondary" id="settings-btn">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Launcher Screen -->
+        <div id="main-screen" class="screen hidden">
+            <div class="launcher-container">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo">
+                            <i class="fas fa-cube"></i>
+                            <span>CraftLauncher</span>
+                        </div>
+                    </div>
+
+                    <nav class="sidebar-nav">
+                        <button class="nav-item active" data-section="home">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </button>
+                        <button class="nav-item" data-section="versions">
+                            <i class="fas fa-download"></i>
+                            <span>Versions</span>
+                        </button>
+                        <button class="nav-item" data-section="mods">
+                            <i class="fas fa-puzzle-piece"></i>
+                            <span>Mods</span>
+                        </button>
+                        <button class="nav-item" data-section="servers">
+                            <i class="fas fa-server"></i>
+                            <span>Servers</span>
+                        </button>
+                        <button class="nav-item" data-section="skins">
+                            <i class="fas fa-user"></i>
+                            <span>Skins</span>
+                        </button>
+                        <button class="nav-item" data-section="news">
+                            <i class="fas fa-newspaper"></i>
+                            <span>News</span>
+                        </button>
+                    </nav>
+
+                    <div class="sidebar-footer">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <img id="user-avatar" src="https://crafatar.com/avatars/steve" alt="User Avatar">
+                            </div>
+                            <div class="user-details">
+                                <span class="username" id="current-username">Player</span>
+                                <span class="account-type" id="account-type">Offline</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="main-content">
+                    <!-- Home Section -->
+                    <div class="content-section active" id="home-section">
+                        <div class="home-header">
+                            <h2>Ready to Play</h2>
+                            <p>Select your Minecraft version and start playing</p>
+                        </div>
+
+                        <div class="launch-panel">
+                            <div class="version-selector">
+                                <label for="version-select">Minecraft Version</label>
+                                <select id="version-select" class="select-input">
+                                    <option value="1.21.1">Release 1.21.1</option>
+                                    <option value="1.21">Release 1.21</option>
+                                    <option value="1.20.6">Release 1.20.6</option>
+                                    <option value="1.20.4">Release 1.20.4</option>
+                                    <option value="1.19.4">Release 1.19.4</option>
+                                    <option value="1.18.2">Release 1.18.2</option>
+                                    <option value="1.16.5">Release 1.16.5</option>
+                                    <option value="1.12.2">Release 1.12.2</option>
+                                    <option value="1.8.9">Release 1.8.9</option>
+                                </select>
+                            </div>
+
+                            <div class="mod-loader-selector">
+                                <label for="mod-loader">Mod Loader</label>
+                                <select id="mod-loader" class="select-input">
+                                    <option value="vanilla">Vanilla</option>
+                                    <option value="forge">Forge</option>
+                                    <option value="fabric">Fabric</option>
+                                    <option value="optifine">OptiFine</option>
+                                </select>
+                            </div>
+
+                            <button class="btn btn-play" id="play-btn">
+                                <i class="fas fa-play"></i>
+                                <span>PLAY</span>
+                            </button>
+                        </div>
+
+                        <div class="quick-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-download"></i>
+                                <span>Downloads: <strong id="download-count">0</strong></span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Playtime: <strong id="playtime">0h 0m</strong></span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-server"></i>
+                                <span>Servers: <strong id="server-count">0</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Versions Section -->
+                    <div class="content-section" id="versions-section">
+                        <div class="section-header">
+                            <h2>Minecraft Versions</h2>
+                            <div class="version-filters">
+                                <button class="filter-btn active" data-filter="all">All</button>
+                                <button class="filter-btn" data-filter="release">Release</button>
+                                <button class="filter-btn" data-filter="snapshot">Snapshot</button>
+                                <button class="filter-btn" data-filter="beta">Beta</button>
+                            </div>
+                        </div>
+                        <div class="versions-grid" id="versions-grid">
+                            <!-- Versions will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Mods Section -->
+                    <div class="content-section" id="mods-section">
+                        <div class="section-header">
+                            <h2>Mod Management</h2>
+                            <button class="btn btn-primary" id="browse-mods">
+                                <i class="fas fa-search"></i>
+                                Browse Mods
+                            </button>
+                        </div>
+                        <div class="mods-container">
+                            <div class="installed-mods">
+                                <h3>Installed Mods</h3>
+                                <div class="mods-list" id="installed-mods">
+                                    <div class="empty-state">
+                                        <i class="fas fa-puzzle-piece"></i>
+                                        <p>No mods installed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Servers Section -->
+                    <div class="content-section" id="servers-section">
+                        <div class="section-header">
+                            <h2>Server List</h2>
+                            <button class="btn btn-primary" id="add-server">
+                                <i class="fas fa-plus"></i>
+                                Add Server
+                            </button>
+                        </div>
+                        <div class="servers-list" id="servers-list">
+                            <div class="empty-state">
+                                <i class="fas fa-server"></i>
+                                <p>No servers added</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skins Section -->
+                    <div class="content-section" id="skins-section">
+                        <div class="section-header">
+                            <h2>Skin Manager</h2>
+                            <button class="btn btn-primary" id="upload-skin">
+                                <i class="fas fa-upload"></i>
+                                Upload Skin
+                            </button>
+                        </div>
+                        <div class="skin-preview">
+                            <div class="skin-viewer">
+                                <img id="skin-preview" src="https://crafatar.com/renders/body/steve" alt="Skin Preview">
+                            </div>
+                            <div class="skin-info">
+                                <h3>Current Skin</h3>
+                                <p>Steve (Default)</p>
+                                <button class="btn btn-secondary" id="reset-skin">Reset to Default</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- News Section -->
+                    <div class="content-section" id="news-section">
+                        <div class="section-header">
+                            <h2>Minecraft News</h2>
+                            <button class="btn btn-secondary" id="refresh-news">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="news-grid" id="news-grid">
+                            <!-- News will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="modal-close" id="close-settings">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-tabs">
+                        <button class="tab-btn active" data-tab="game">Game</button>
+                        <button class="tab-btn" data-tab="launcher">Launcher</button>
+                        <button class="tab-btn" data-tab="about">About</button>
+                    </div>
+
+                    <div class="tab-content active" id="game-settings">
+                        <div class="setting-group">
+                            <label for="ram-allocation">RAM Allocation (MB)</label>
+                            <input type="range" id="ram-allocation" min="1024" max="8192" value="2048" step="512">
+                            <span class="range-value">2048 MB</span>
+                        </div>
+                        <div class="setting-group">
+                            <label for="resolution-width">Resolution Width</label>
+                            <input type="number" id="resolution-width" value="1280" min="800" max="3840">
+                        </div>
+                        <div class="setting-group">
+                            <label for="resolution-height">Resolution Height</label>
+                            <input type="number" id="resolution-height" value="720" min="600" max="2160">
+                        </div>
+                        <div class="setting-group">
+                            <label for="jvm-args">JVM Arguments</label>
+                            <textarea id="jvm-args" placeholder="-XX:+UseG1GC -XX:+UnlockExperimentalVMOptions"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="launcher-settings">
+                        <div class="setting-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="dark-mode" checked>
+                                <span class="checkmark"></span>
+                                Dark Mode
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="auto-update">
+                                <span class="checkmark"></span>
+                                Auto Update Launcher
+                            </label>
+                        </div>
+                        <div class="setting-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="close-launcher">
+                                <span class="checkmark"></span>
+                                Close Launcher After Game Start
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="about-settings">
+                        <div class="about-info">
+                            <div class="about-logo">
+                                <i class="fas fa-cube"></i>
+                                <h3>CraftLauncher</h3>
+                            </div>
+                            <p>Version 1.0.0</p>
+                            <p>A modern web-based Minecraft launcher</p>
+                            <div class="about-links">
+                                <a href="#" class="btn btn-secondary">GitHub</a>
+                                <a href="#" class="btn btn-secondary">Discord</a>
+                                <a href="#" class="btn btn-secondary">Support</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Modal -->
+        <div id="progress-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="progress-title">Downloading...</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="progress-info">
+                        <div class="progress-details">
+                            <span id="progress-file">Preparing download...</span>
+                            <span id="progress-speed">0 KB/s</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-stats">
+                            <span id="progress-percent">0%</span>
+                            <span id="progress-size">0 MB / 0 MB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/versions.js"></script>
+    <script src="js/downloader.js"></script>
+    <script src="js/launcher.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
